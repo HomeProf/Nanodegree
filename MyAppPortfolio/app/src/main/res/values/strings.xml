@@ -14,4 +14,10 @@
     <string name="button_app_5">GO UBIQUITOUS</string>
     <string name="button_app_6">CAPSTONE</string>
 
+    <!--Toasts-->
+    <string name="toast_prefix">This button will launch my</string>
+    <string name="toast_postfix">app!</string>
+
+
+
 </resources>

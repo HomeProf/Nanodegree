@@ -1,7 +1,9 @@
 package com.example.android.app.portfolio.myappportfolio;
 
-import android.support.v4.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,13 +13,21 @@ import android.widget.Toast;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
+public class MainActivityFragment extends Fragment implements View.OnClickListener {
 
     public MainActivityFragment() {
     }
 
-    final String prefix = "This button will launch my ";
-    final String postfix = " app!";
+    private final FragmentActivity mContext = getActivity();
+
+    private final String space = " ";
+    private String prefix = null;
+    private String postfix = null;
+
+    private Button mPopularMoviesButton, mStockHawkButton, mBuildItBiggerButton, mMakeYourAppMaterialButtonn, mGoUbiquitousButton, mCapstoneButton;
+
+    private static Toast toast;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -25,58 +35,62 @@ public class MainActivityFragment extends Fragment {
 
         View view = (View) inflater.inflate(R.layout.fragment_main, container, false);
 
-        final Button button1 = (Button) view.findViewById(R.id.button1);
-        button1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showTextNow(button1.getText().toString());
-            }
-        });
+        prefix = getString(R.string.toast_prefix) + space;
+        postfix =  space + getString(R.string.toast_postfix);
 
-        final Button button2 = (Button) view.findViewById(R.id.button2);
-        button2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showTextNow(button2.getText().toString());
-            }
-        });
 
-        final Button button3 = (Button) view.findViewById(R.id.button3);
-        button3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showTextNow(button3.getText().toString());
-            }
-        });
+        mPopularMoviesButton = (Button) view.findViewById(R.id.button1);
+        mStockHawkButton = (Button) view.findViewById(R.id.button2);
+        mBuildItBiggerButton = (Button) view.findViewById(R.id.button3);
+        mMakeYourAppMaterialButtonn = (Button) view.findViewById(R.id.button4);
+        mGoUbiquitousButton = (Button) view.findViewById(R.id.button5);
+        mCapstoneButton = (Button) view.findViewById(R.id.button6);
 
-        final Button button4 = (Button) view.findViewById(R.id.button4);
-        button4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showTextNow(button4.getText().toString());
-            }
-        });
-
-        final Button button5 = (Button) view.findViewById(R.id.button5);
-        button5.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showTextNow(button5.getText().toString());
-            }
-        });
-
-        final Button button6 = (Button) view.findViewById(R.id.button6);
-        button6.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showTextNow(button6.getText().toString());
-            }
-        });
+        mPopularMoviesButton.setOnClickListener(this);
+        mStockHawkButton.setOnClickListener(this);
+        mBuildItBiggerButton.setOnClickListener(this);
+        mMakeYourAppMaterialButtonn.setOnClickListener(this);
+        mGoUbiquitousButton.setOnClickListener(this);
+        mCapstoneButton.setOnClickListener(this);
 
         return view;
     }
 
-    public void showTextNow(String caption) {
-        Toast.makeText(getActivity(),prefix + caption + postfix, Toast.LENGTH_SHORT).show();
+    @Override
+    public void onClick(View v) {
+        Button button = (Button) v;
+        switch(button.getId()) {
+            case R.id.button1:
+                showToast(getActivity(),button.getText().toString());
+                break;
+            case R.id.button2:
+                showToast(getActivity(),button.getText().toString());
+                break;
+            case R.id.button3:
+                showToast(getActivity(),button.getText().toString());
+                break;
+            case R.id.button4:
+                showToast(getActivity(),button.getText().toString());
+                break;
+            case R.id.button5:
+                showToast(getActivity(),button.getText().toString());
+                break;
+            case R.id.button6:
+                showToast(getActivity(),button.getText().toString());
+                break;
+        }
+    }
+
+
+    /* Taken from  https://gist.github.com/raafaelima/338be1b4b6a21cba1ea2c2a7d7bd4051 */
+
+    private void showToast(Context ctx, String caption) {
+        //if the toast is showing, we cancel its exibition.
+        if (toast != null) {
+            toast.cancel();
+        }
+        //Then we create another toast and show tit to the user
+        toast = Toast.makeText(ctx, prefix + caption + postfix, Toast.LENGTH_SHORT);
+        toast.show();
     }
 }

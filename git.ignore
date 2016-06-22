@@ -1,3 +1,4 @@
 ./MyAppPortfolio/*.properties
 ./MyAppPortfolio/*.iml
 ./MyAppPortfolio/*.txt
+./MyAppPortfolio/*.idea
