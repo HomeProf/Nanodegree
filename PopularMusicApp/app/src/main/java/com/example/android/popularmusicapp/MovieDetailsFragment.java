@@ -1,6 +1,5 @@
 package com.example.android.popularmusicapp;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -17,13 +16,11 @@ public class MovieDetailsFragment extends Fragment {
     public MovieDetailsFragment() {
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View rootView = (View) inflater.inflate(R.layout.fragment_movie_details, container, false);
-        Intent intent = getActivity().getIntent();
+        View rootView = inflater.inflate(R.layout.fragment_movie_details, container, false);
 
             TextView titleTextView = (TextView) rootView.findViewById(R.id.movie_details_title);
             if(GridActivityFragment.CUR_TITLE != null) {
@@ -35,7 +32,7 @@ public class MovieDetailsFragment extends Fragment {
 
             TextView dateTextView = (TextView) rootView.findViewById(R.id.movie_details_date);
             if(GridActivityFragment.CUR_RELEASE_DATE != null) {
-                dateTextView.setText(GridActivityFragment.CUR_RELEASE_DATE);
+                dateTextView.setText(getString(R.string.empty_date_prefix) + Constants.space + GridActivityFragment.CUR_RELEASE_DATE);
             }
             else {
                 dateTextView.setText(getString(R.string.empty_date_en));
@@ -43,7 +40,7 @@ public class MovieDetailsFragment extends Fragment {
 
             TextView popularityTextView = (TextView) rootView.findViewById(R.id.movie_details_popularity);
             if(GridActivityFragment.CUR_POPULARITY != null) {
-                popularityTextView .setText(GridActivityFragment.CUR_POPULARITY);
+                popularityTextView .setText(getString(R.string.empty_popularity_prefix) + Constants.space + GridActivityFragment.CUR_POPULARITY);
             }
             else {
                 popularityTextView.setText(getString(R.string.empty_popularity_en));
@@ -51,7 +48,7 @@ public class MovieDetailsFragment extends Fragment {
 
             TextView rateCountTextView = (TextView) rootView.findViewById(R.id.movie_details_vote_ave);
             if(GridActivityFragment.CUR_VOTE_AVE != null) {
-                rateCountTextView.setText(GridActivityFragment.CUR_VOTE_AVE);
+                rateCountTextView.setText(getString(R.string.empty_vote_ave_prefix) + Constants.space + GridActivityFragment.CUR_VOTE_AVE);
             }
             else {
                 rateCountTextView.setText(getString(R.string.empty_vote_ave_en));

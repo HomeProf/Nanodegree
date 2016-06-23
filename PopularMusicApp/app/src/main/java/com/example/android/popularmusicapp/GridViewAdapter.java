@@ -13,8 +13,8 @@ import java.util.ArrayList;
 public class GridViewAdapter extends ArrayAdapter<ImageItem> {
 
     private Context context;
-    private int layoutResourceId;
-    private ArrayList<ImageItem> data = new ArrayList<ImageItem>();
+    private final int layoutResourceId;
+    private ArrayList<ImageItem> data = new ArrayList<>();
 
     public GridViewAdapter(Context context, int layoutResourceId, ArrayList<ImageItem> data) {
         super(context, layoutResourceId, data);

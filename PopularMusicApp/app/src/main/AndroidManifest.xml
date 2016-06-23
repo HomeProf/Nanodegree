@@ -3,16 +3,8 @@
     package="com.example.android.popularmusicapp">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.SET_DEBUG_APP" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-
-    <meta-data
-        android:name="android.app.default_searchable"
-        android:value="com.apkgetter.SearchResultsActivity" />
 
     <application
         android:allowBackup="true"
@@ -38,7 +30,8 @@
             android:name=".MovieDetails"
             android:label="@string/title_activity_movie_details"
             android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:launchMode="singleInstance">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.android.popularmusicapp.GridActivity" />
@@ -47,7 +40,6 @@
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".AboutActivity"/>
     </application>
 
 </manifest>

@@ -16,16 +16,16 @@
             android:id="@+id/movie_details_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Titeltext"
             android:textAppearance="?android:attr/textAppearanceLarge"/>
 
         <!-- Main content: high, low, art, weather state -->
         <LinearLayout
             android:gravity="center_horizontal"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:layout_marginTop="16dp"
             android:layout_width="match_parent"
             android:orientation="horizontal"
+            android:baselineAligned="false"
             android:layout_weight="1">
 
             <LinearLayout
@@ -93,12 +93,13 @@
                 android:gravity="center_horizontal"
                 android:layout_gravity="center"
                 android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:orientation="vertical"
                 android:layout_weight="1">
 
                 <ImageView
                     android:id="@+id/movie_details_image"
+                    android:contentDescription="@string/movie_details_image_desc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
@@ -123,7 +124,6 @@
                 android:id="@+id/movie_details_synopsis"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Synopsis"
                 />
 
 

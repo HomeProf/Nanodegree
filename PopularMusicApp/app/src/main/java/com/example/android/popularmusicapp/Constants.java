@@ -25,4 +25,8 @@ public class Constants {
 
     public final static String  OVERVIEW = "overview";
 
+    /** String manipulation **/
+
+    public final static String space = " ";
+
 }

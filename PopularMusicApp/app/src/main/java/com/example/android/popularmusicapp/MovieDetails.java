@@ -1,6 +1,5 @@
 package com.example.android.popularmusicapp;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -10,11 +9,7 @@ import android.view.MenuItem;
 
 public class MovieDetails extends AppCompatActivity {
 
-
-
     private static final String LOG_TAG = MovieDetails.class.getSimpleName();
-
-    protected Intent curIntent = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

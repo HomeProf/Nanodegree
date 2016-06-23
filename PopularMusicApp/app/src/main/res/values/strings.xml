@@ -4,7 +4,7 @@
     <string name="action_about">About</string>
     <string name="title_activity_movie_details">MovieDetails</string>
 
-    <string name="gridView_editText">Search ...</string>
+    <string name="gridView_editText">Search&#8230;</string>
     <string name="title_activity_settings">SettingsActivity</string>
 
     <!-- Preferences -->
@@ -16,8 +16,6 @@
 
     <!-- Server-Details -->
 
-    <string name="base_url">api.themoviedb.org</string>
-    <!--    <string name="search_url_part">/3/search/movie</string>-->
     <string name="api_key">MY_API_KEY</string>
     <string name="title_activity_grid_view_adapter">GridViewAdapter</string>
 
@@ -29,15 +27,18 @@
     <string name="empty_date_en">n/A</string>
     <string name="empty_title_en">Title not available</string>
 
+    <!-- MovieDetails prefix strings -->
+    <string name="empty_vote_ave_prefix">Rating Average:</string>
+    <string name="empty_rated_Count_prefix">Rating:</string>
+    <string name="empty_popularity_prefix">Popularity:</string>
+    <string name="empty_date_prefix">Release Date:</string>
 
-    <string name="on_progress_caption">load movies ...</string>
-    <string name="hotel_de">Hotel.de</string>
-    <string name="action_booking">booking a hotel</string>
 
-    <!-- AboutActivity -->
-    <string name="about_caption">Showcase App</string>
-    <string name="about_description">Hotel rooms generate revenue since Hollywood is so reliable!</string>
-    <string name="about_author">Benedikt Hofrichter</string>
+    <string name="on_progress_caption">load movies&#8230;</string>
+    <string name="movie_details_image_desc">movie image desc</string>
+
+
+
 
 
 

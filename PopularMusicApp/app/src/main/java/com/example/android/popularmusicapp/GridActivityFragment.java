@@ -13,13 +13,9 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -30,8 +26,6 @@ import org.json.JSONException;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -43,9 +37,6 @@ import java.util.List;
 import java.util.Map;
 
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class GridActivityFragment extends Fragment {
 
 
@@ -57,13 +48,12 @@ public class GridActivityFragment extends Fragment {
 
     private final Utility mUtility = new Utility();
 
-    protected GridView gridView;
-    protected GridViewAdapter gridAdapter;
-    protected View rootView;
-    protected SearchView searchView = null;
+    private GridView gridView;
+    private GridViewAdapter gridAdapter;
+    private View rootView;
 
-    public static String CUR_PREF_ORDER;
-    protected SharedPreferences sharedpreferences;
+    private static String CUR_PREF_ORDER;
+    private SharedPreferences sharedpreferences;
 
     protected static String CUR_TITLE = null;
     protected static String CUR_RELEASE_DATE = null;
@@ -72,15 +62,16 @@ public class GridActivityFragment extends Fragment {
     protected static String CUR_SYNOPSIS = null;
     protected static Bitmap CUR_IMAGE = null;
 
-    protected ProgressDialog mProgressDialog;
-    protected PowerManager.WakeLock mWakeLock;
+    private AsyncMetadata jsonTask;
+
+    private ProgressDialog mProgressDialog;
+    private PowerManager.WakeLock mWakeLock;
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        setRetainInstance(true);
     }
 
     @Override
@@ -89,32 +80,26 @@ public class GridActivityFragment extends Fragment {
 
         String tmp = sharedpreferences.getString(getString(R.string.pref_sort_order), getString(R.string.pref_most_popular));
 
-        if(searchView != null) {
-            if(!tmp.equals(CUR_PREF_ORDER)) {
-            String query = searchView.getQuery().toString();
-            if(query != "" || query != null) {
+        if (!tmp.equals(CUR_PREF_ORDER)) {
 
-                if (query != null && query != "") {
-                    processRequestWithDependencies(query);
-                } else {
-                    Log.d(LOG_TAG, "query String is null or empty.");
-                }
-            }
-            }
+            CUR_PREF_ORDER = sharedpreferences.getString(getString(R.string.pref_sort_order), getString(R.string.pref_most_popular));
+            processSearchText();
+        } else {
+            Log.d(LOG_TAG, "query String is null or empty.");
         }
+
     }
 
-    protected AsyncMetadata task;
 
-    private void processSearchText(String searchText) {
+    private void processSearchText() {
 
-        task = new AsyncMetadata();
-        task.execute(searchText);
+        jsonTask = new AsyncMetadata();
+        jsonTask.execute();
 
         mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
-                task.cancel(true);
+                jsonTask.cancel(true);
             }
         });
     }
@@ -124,7 +109,6 @@ public class GridActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         sharedpreferences = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
-
 
         rootView = inflater.inflate(R.layout.fragment_movie_grid, container, false);
 
@@ -146,6 +130,7 @@ public class GridActivityFragment extends Fragment {
                 Intent detailsIntent = new Intent(getActivity().getApplicationContext(), MovieDetails.class);
 
                 startActivity(detailsIntent);
+
             }
         });
 
@@ -155,85 +140,20 @@ public class GridActivityFragment extends Fragment {
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mProgressDialog.setCancelable(true);
 
-        if(!mUtility.isWiFiInternetAvailable(getActivity())) {
-            getActivity().runOnUiThread(new Runnable() {
-                public void run() {
-
-                    Toast toast = Toast.makeText(getContext(), "WiFi is disabled!", Toast.LENGTH_SHORT);
-                    toast.setGravity(Gravity.TOP | Gravity.CENTER, 0, 100);
-                    toast.show();
-                }
-            });
-        }
 
         return rootView;
     }
 
 
-    private void processRequestWithDependencies(String query) {
-        searchView.clearFocus();
-        CUR_PREF_ORDER = sharedpreferences.getString(getString(R.string.pref_sort_order), getString(R.string.pref_most_popular));
-
-        if(mUtility.isWiFiInternetAvailable(getActivity())) {
-            processSearchText(query);
-        }
-        else if(mUtility.isMobileInternetAvailable(getActivity())) {
-            processSearchText(query);
-        }
-        else {
-            getActivity().runOnUiThread(new Runnable() {
-                public void run() {
-
-                    Toast toast = Toast.makeText(getContext(), "No Internet Connection.", Toast.LENGTH_SHORT);
-                    toast.setGravity(Gravity.TOP | Gravity.CENTER, 0, 100);
-                    toast.show();
-                }
-            });
-        }
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-
-        if (searchItem != null) {
-            searchView = (SearchView) searchItem.getActionView();
-        }
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-
-            public boolean onQueryTextChange(String newText) {
-                // this is your adapter that will be filtered
-                return true;
-            }
-
-            public boolean onQueryTextSubmit(String query) {
-
-                if (query != null && query != "") {
-                    processRequestWithDependencies(query);
-                } else {
-                    Log.d(LOG_TAG, "query String is null or empty.");
-                }
-
-                return true;
-            }
-        });
-    }
-
-    private class AsyncMetadata extends AsyncTask<String, Integer, List<Map<String, String>>> {
+    private class AsyncMetadata extends AsyncTask<Void, Integer, List<Map<String, String>>> {
 
         private final String LOG_TAG = GridActivity.class.getSimpleName();
-
-        public List<Map<String, String>> resultList;
 
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            // take CPU lock to prevent CPU from going off if the user
-            // presses the power button during download
+
             PowerManager pm = (PowerManager) getContext().getSystemService(Context.POWER_SERVICE);
             mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                     getClass().getName());
@@ -244,9 +164,8 @@ public class GridActivityFragment extends Fragment {
         @Override
         protected void onProgressUpdate(Integer... progress) {
             super.onProgressUpdate(progress);
-            // if we get here, length is known, now set indeterminate to false
             mProgressDialog.setIndeterminate(false);
-            mProgressDialog.setMax(20);
+            mProgressDialog.setMax(10);
             mProgressDialog.setProgress(progress[0]);
 
         }
@@ -268,7 +187,6 @@ public class GridActivityFragment extends Fragment {
                         } else {
                             gridAdapter = new GridViewAdapter(getActivity().getApplicationContext(), R.layout.grid_item_layout, new ArrayList());
                             gridView.setAdapter(gridAdapter);
-//                            Toast.makeText(getActivity(), "No results found for that", Toast.LENGTH_SHORT).show();
                         }
 
                     }
@@ -288,9 +206,7 @@ public class GridActivityFragment extends Fragment {
                         }
                     });
                     Log.d(LOG_TAG, "No Movies for that.");
-
             }
-
         }
 
         private String getResponseForUri(String uri) {
@@ -342,32 +258,20 @@ public class GridActivityFragment extends Fragment {
         }
 
         @Override
-        protected List<Map<String, String>> doInBackground(String... params) {
+        protected List<Map<String, String>> doInBackground(Void ... params) {
 
             List<Map<String, String>> jsonList = new ArrayList<>();
 
-            String inputParam = params[0];
-
             try {
+                    String tmp = sharedpreferences.getString(getString(R.string.pref_sort_order), getString(R.string.pref_most_popular));
 
-                if (inputParam.length() > 0) {
+                    String pref_uri = mUtility.getUriForPref(getActivity(), tmp, getString(R.string.pref_most_popular_default), getString(R.string.pref_vote_ave_default));
+                    String response = getResponseForUri(pref_uri);
 
-                    String kw_uri = mUtility.getUriForKeywords(getActivity(), inputParam);
-                    String kw_response = getResponseForUri(kw_uri);
-                    String[] keywords = mUtility.getKeywordsFromJson(kw_response);
+                    Log.d("DEBUGINGATTENTION: ", pref_uri);
 
-                    if(keywords.length>0) {
-                        String uri = mUtility.getUriForParam(getActivity(), keywords);
-                        String response = getResponseForUri(uri);
+                    jsonList = mUtility.formatJsonResponse(response);
 
-                        Log.d("DEBUGINGATTENTION: ", uri);
-
-                        jsonList = mUtility.formatJsonResponse(response);
-                    }
-                    else {
-                       return null;
-                    }
-                }
                 return jsonList;
             } catch (JSONException e) {
                 Log.e(LOG_TAG, "JSON Error", e);
@@ -396,11 +300,6 @@ public class GridActivityFragment extends Fragment {
                     bis = new BufferedInputStream(is, 8192);
                     bm = BitmapFactory.decodeStream(bis);
 
-                    ByteArrayOutputStream out = new ByteArrayOutputStream();
-                    bm.compress(Bitmap.CompressFormat.JPEG, 20, out);
-                    Bitmap decoded = BitmapFactory.decodeStream(new ByteArrayInputStream(out.toByteArray()));
-                    bm = decoded;
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -423,10 +322,8 @@ public class GridActivityFragment extends Fragment {
             }
 
 
-
             @Override
             protected ArrayList<ImageItem> doInBackground(List<Map<String, String>>... params) {
-
 
                 List<Map<String, String>> list = params[0];
 
@@ -441,14 +338,14 @@ public class GridActivityFragment extends Fragment {
             }
 
             private ArrayList<ImageItem> publishImageBulk(List<Map<String, String>> helperList) {
-                ArrayList<ImageItem> bmps = new ArrayList<ImageItem>();
+                ArrayList<ImageItem> bmps = new ArrayList<>();
 
                 Bitmap bm = null;
 
                 for (int i = 0; i < helperList.size(); i++) {
                     Map cur = helperList.get(i);
                     String posterPath = cur.get(Constants.POSTER_PATH).toString().substring(1);
-                    if (posterPath != null) {
+                    if (posterPath != "") {
                         bm = loadBitmap(posterPath);
                     }
                     if (bm == null) {
@@ -469,13 +366,8 @@ public class GridActivityFragment extends Fragment {
 
             @Override
             protected void onProgressUpdate(Integer... values) {
-                task.onProgressUpdate(values);
+                jsonTask.onProgressUpdate(values);
             }
         }
 
-
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-    }
 }

@@ -37,18 +37,8 @@ public class GridActivity extends AppCompatActivity {
             return true;
         }
 
-        if (id == R.id.action_about) {
-            Intent intent = new Intent(getApplicationContext(), AboutActivity.class);
-            startActivity(intent);
-            return true;
-        }
-
 
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
 }

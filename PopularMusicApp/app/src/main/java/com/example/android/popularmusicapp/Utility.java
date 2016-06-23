@@ -1,12 +1,7 @@
 package com.example.android.popularmusicapp;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
-import android.net.wifi.WifiManager;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -20,9 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 
-/**
- * Created by xander on 13.06.16.
- */
 public class Utility {
 
     public Utility() {
@@ -30,18 +22,26 @@ public class Utility {
 
     private static final String LOG_TAG = Utility.class.getSimpleName();
 
-    // https://api.themoviedb.org/3/search/keyword?api_key=[]&query=cat
-    public String getUriForKeywords(Context context, String param) {
+    // http://api.themoviedb.org/3/movie/top_rated?api_key=[]
+    public String getUriForPref(Context context, String pref,String valueMostPopular, String valueTopRated) {
         Uri.Builder uriBuilder = new Uri.Builder();
 
 
         uriBuilder.scheme("http")
-                .authority(context.getString(R.string.base_url))
+                .authority("api.themoviedb.org")
                 .appendPath("3")
-                .appendPath("search")
-                .appendPath("keyword")
-                .appendQueryParameter("query", param)
-                .appendQueryParameter("api_key", context.getString(R.string.api_key));
+                .appendPath("movie");
+        if(pref.equals(valueMostPopular)) {
+            uriBuilder.appendPath("popular");
+        }
+        else if(pref.equals(valueTopRated)) {
+            uriBuilder.appendPath("top_rated");
+        }
+        else {
+            return "";
+        }
+
+        uriBuilder.appendQueryParameter("api_key", context.getString(R.string.api_key));
 
         try {
             return uriBuilder.build().toString();
@@ -51,51 +51,6 @@ public class Utility {
         }
     }
 
-
-  //  http://api.themoviedb.org/3/discover/movie?primary_release_date.gte=0&sort_by=popularity.desc&api_key=[]&with_keywords=1721
-    public String getUriForParam(Context context, String[] keywords) {
-
-        Uri.Builder uriBuilder = new Uri.Builder();
-
-        String kwConcat = "";
-        final String concatAND = "|";
-
-        if(keywords.length>0) {
-            kwConcat = keywords[0];
-        }
-        for (int i = 1; i<keywords.length;i++) {
-            kwConcat += concatAND + keywords[i];
-        }
-
-        SharedPreferences sharedpreferences = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-        String sortOrderPref = sharedpreferences.getString(context.getString(R.string.pref_sort_order),context.getString(R.string.pref_most_popular));
-
-        uriBuilder.scheme("http")
-                .authority(context.getString(R.string.base_url))
-                .appendPath("3")
-                .appendPath("discover")
-                .appendPath("movie")
-                .encodedQuery("with_keywords=" + kwConcat)
-                .appendQueryParameter("primary_release_date.gte", "0")
-                .appendQueryParameter("api_key", context.getString(R.string.api_key)
-                );
-
-
-        if(sortOrderPref.equals(context.getString(R.string.pref_most_popular_default))) {
-
-            uriBuilder.appendQueryParameter("sort_by", "popularity.desc");
-        }
-        else if(sortOrderPref.equals(context.getString(R.string.pref_vote_ave_default))) {
-
-            uriBuilder.appendQueryParameter("sort_by", "vote_average.desc");
-        }
-        try {
-            return uriBuilder.build().toString();
-        } catch (UnsupportedOperationException e) {
-            Log.e(LOG_TAG, e.getMessage());
-            return "";
-        }
-    }
 
     public String getUriStringForImages(Context context, String posterPath) {
         Uri.Builder uriBuilder = new Uri.Builder();
@@ -117,28 +72,12 @@ public class Utility {
         }
     }
 
-    public String[] getKeywordsFromJson(String jsonStr) throws JSONException {
-
-            List resultList = new ArrayList();
-            JSONObject o = new JSONObject(jsonStr);
-            final Integer TOTAL_PAGES = (o.getInt("total_pages"));
-            JSONArray arr = o.getJSONArray("results");
-
-            String[] result = new String[arr.length()];
-
-        for(int i=0; i<arr.length(); i++) {
-            result[i] =  arr.getJSONObject(i).getString("id");
-        }
-
-        return result;
-    }
-
     public List<Map<String,String>> formatJsonResponse(String jsonStr)
             throws JSONException {
 
         List resultList = new ArrayList();
         JSONObject o = new JSONObject(jsonStr);
-        final Integer TOTAL_PAGES = (o.getInt("total_pages"));
+//        final Integer TOTAL_PAGES = (o.getInt("total_pages"));
         JSONArray arr = o.getJSONArray("results");
 
         if (arr.length()>0) {
@@ -164,48 +103,16 @@ public class Utility {
 
     }
 
-    public boolean isWiFiInternetAvailable(Context context) {
-        WifiManager wifiManager = (WifiManager) context.getSystemService(context.WIFI_SERVICE);
-        boolean wifiEnabled = wifiManager.isWifiEnabled();
 
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) context.getSystemService(context.CONNECTIVITY_SERVICE);
-
-        if(wifiEnabled) {
-            NetworkInfo mobileInfo =
-                    connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-
-            if (mobileInfo.getState().equals(NetworkInfo.State.CONNECTED)) {
-                Log.d(LOG_TAG, "connection via WiFi internet available.");
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean isMobileInternetAvailable(Context context) {
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) context.getSystemService(context.CONNECTIVITY_SERVICE);
-
-        NetworkInfo mobileInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-        boolean mobileConnected = mobileInfo.getState().equals(NetworkInfo.State.CONNECTED);
-        if(mobileConnected) {
-            Log.d(LOG_TAG, "connection via mobil internet available.");
-        }
-
-        return mobileConnected;
-    }
-
-
-    public static double renderRatingStars(double rating) {
-        double halfNumb = rating / 2.0;
-        double integer = Math.floor(halfNumb);
-        double diff =  halfNumb - integer;
-        final double step = 0.5d;
-        if(diff>=step) {
-            integer += step;
-        }
-        return integer;
-    }
+//    public static double renderRatingStars(double rating) {
+//        double halfNumb = rating / 2.0;
+//        double integer = Math.floor(halfNumb);
+//        double diff =  halfNumb - integer;
+//        final double step = 0.5d;
+//        if(diff>=step) {
+//            integer += step;
+//        }
+//        return integer;
+//    }
 }
 
